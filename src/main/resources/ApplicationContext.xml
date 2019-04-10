@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/1809cjgl"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+    <!-- 配置管理工厂 -->
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <!-- 给出上面定义的bean：dataSoure -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 实体类的包所在路径 -->
+        <property name="packagesToScan" value="com.idiot.entity" />
+        <!-- 配置下级数据库访问框架，这里是hibernate -->
+        <property name="jpaVendorAdapter">
+            <!-- 加载配置器 -->
+            <bean id="jpaVendorAdapter"
+                  class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+        </property>
+
+        <!-- 给出上面配置的下级数据库访问框架的设置 hibernate至少要配置dialect和hbm2ddl.auto -->
+        <property name="jpaProperties">
+            <props>
+                <!-- 数据库方言设置 -->
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL55Dialect</prop>
+                <!-- 更新方式 -->
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <!-- 在控制台显示sql操作语句 -->
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- 事务管理器 -->
+    <bean id="transactionManager"
+          class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory"
+                  ref="entityManagerFactory" />
+    </bean>
+    <context:annotation-config />
+    <context:component-scan base-package="com.idiot" />
+
+    <jpa:repositories base-package="com.idiot.repository"/>
+</beans>
